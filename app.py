@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from bvh_parser import BVHParser
-from database import session, uploads_table, SAVE_DIR
+from database import session, uploads_table, SAVE_DIR, upload_file_to_gdrive
 import numpy as np
 import pandas as pd
 from streamlit_option_menu import option_menu
@@ -137,6 +137,9 @@ if selected == "メインページ":
                 bvh_path = os.path.join(SAVE_DIR, bvh_filename)
                 with open(bvh_path, "wb") as f:
                     f.write(st.session_state.uploaded_file.getbuffer())
+
+                # BVHファイルをGoogle Driveにアップロード
+                upload_file_to_gdrive(bvh_path)
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
