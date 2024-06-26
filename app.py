@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from bvh_parser import BVHParser
-from database import session, uploads_table, SAVE_DIR, upload_file_to_s3, BUCKET_NAME
+from database import session, uploads_table, SAVE_DIR, upload_file_to_s3
 import numpy as np
 import pandas as pd
 from streamlit_option_menu import option_menu
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 import io
 
+# サイドバーにメニューを追加
 with st.sidebar:
     selected = option_menu(
         menu_title=None,  # メニュータイトル
@@ -138,7 +139,7 @@ if selected == "メインページ":
                     f.write(st.session_state.uploaded_file.getbuffer())
 
                 # BVHファイルをS3にアップロード
-                upload_file_to_s3(bvh_path, bvh_filename)
+                s3_bvh_path = upload_file_to_s3(bvh_path, f"uploaded_files/{bvh_filename}")
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
@@ -177,7 +178,7 @@ if selected == "メインページ":
                 st.session_state.bvh_path = bvh_path
                 st.session_state.submitted = True
 
-                st.success(f"データが保存されました: {bvh_path}")
+                st.success(f"データが保存されました: {s3_bvh_path}")
 
                 st.write(f"NIOSH Lifting Index: {lifting_index:.2f}")
 
@@ -242,6 +243,7 @@ if selected == "メインページ":
                 st.components.v1.html(html_template, height=600)
             except Exception as e:
                 st.error(f"エラーが発生しました: {e}")
+
 
 elif selected == "ダッシュボード":
     st.title("データ分布ダッシュボード")

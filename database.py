@@ -31,7 +31,8 @@ if not os.path.exists(DB_DIR):
     os.makedirs(DB_DIR)
 
 # データベース設定
-DATABASE_URL = f"sqlite:///{os.path.join(DB_DIR, 'uploaded_data.db')}"
+DATABASE_PATH = os.path.join(DB_DIR, 'uploaded_data.db')
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 engine = create_engine(DATABASE_URL)
 metadata = MetaData()
 
@@ -54,3 +55,6 @@ uploads_table = Table(
 metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
+
+# データベースファイルをS3にアップロード
+db_s3_path = upload_file_to_s3(DATABASE_PATH, "uploaded_files/uploaded_data.db")
