@@ -148,25 +148,25 @@ if selected == "メインページ":
                 # 持ち上げ開始位置と終了位置の取得
                 root_node = bvh_parser.get_root()
                 frame_data = bvh_parser.frames
-                
+
                 # ここでは腰の位置を取得することを仮定
                 hips_node = root_node  # rootノードが腰の位置を示していると仮定
 
                 # 全フレームの腰の位置を取得
                 hip_positions = np.array([frame[:3] for frame in hips_node.channel_values])
                 hip_rotations = np.array([frame[3:6] for frame in hips_node.channel_values])  # 追加：腰の回転角を取得
-                
+
                 # 最も低い位置と最も高い位置を取得
                 start_position = hip_positions[np.argmin(hip_positions[:, 1])]
                 end_position = hip_positions[np.argmax(hip_positions[:, 1])]
-                
+
                 start_height = start_position[1]
                 end_height = end_position[1]
 
                 # 非対称角度の計算（腰の回転角の2分の1）
                 max_rotation = np.max(hip_rotations, axis=0)
                 asymmetry_angle = max_rotation[1]  # Y軸の回転角度を使用
-                
+
                 # 重さの取得
                 weight_lifted = 25  # 入力された体重を使用
 
@@ -195,6 +195,9 @@ if selected == "メインページ":
                     )
                 )
                 session.commit()
+
+                # S3にデータベースファイルをアップロード
+                upload_file_to_s3(DATABASE_PATH, "DB/uploaded_data.db")
 
                 # セッションステートを更新
                 st.session_state.age = age
