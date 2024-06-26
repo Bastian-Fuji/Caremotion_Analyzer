@@ -12,18 +12,18 @@ s3 = boto3.client(
     region_name=st.secrets["s3"]["region"]
 )
 BUCKET_NAME = st.secrets["s3"]["bucket_name"]
-DB_S3_PATH = 'DB/uploaded_data.db'
-
-# S3からファイルをダウンロードする関数
-def download_file_from_s3(s3_path, local_path):
-    s3.download_file(BUCKET_NAME, s3_path, local_path)
 
 # S3にファイルをアップロードする関数
 def upload_file_to_s3(local_path, s3_path=None):
     if s3_path is None:
-        s3_path = os.path.join('DB', os.path.basename(local_path))
+        s3_path = os.path.join('bvh', os.path.basename(local_path))
     s3.upload_file(local_path, BUCKET_NAME, s3_path)
     return s3_path
+
+# 保存ディレクトリの設定
+SAVE_DIR = "BVH"
+if not os.path.exists(SAVE_DIR):
+    os.makedirs(SAVE_DIR)
 
 # データベースディレクトリの設定
 DB_DIR = "DB"
@@ -31,13 +31,6 @@ if not os.path.exists(DB_DIR):
     os.makedirs(DB_DIR)
 
 DATABASE_PATH = os.path.join(DB_DIR, 'uploaded_data.db')
-
-# S3からデータベースファイルをダウンロード
-if not os.path.exists(DATABASE_PATH):
-    try:
-        download_file_from_s3(DB_S3_PATH, DATABASE_PATH)
-    except Exception as e:
-        print(f"S3からデータベースファイルをダウンロードできませんでした: {e}")
 
 # データベース設定
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
@@ -69,6 +62,9 @@ import atexit
 
 def at_exit():
     session.commit()  # データベースセッションのコミット
-    upload_file_to_s3(DATABASE_PATH, DB_S3_PATH)  # パスを明示的に指定
+    upload_file_to_s3(DATABASE_PATH, 'DB/uploaded_data.db')  # パスを明示的に指定
 
 atexit.register(at_exit)
+
+# データベースファイルをS3にアップロード
+upload_file_to_s3(DATABASE_PATH, 'DB/uploaded_data.db')  # 初期アップロード
