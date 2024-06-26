@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from bvh_parser import BVHParser
-from database import session, uploads_table, SAVE_DIR, upload_file_to_s3, download_file_from_s3
+from database import session, uploads_table, SAVE_DIR, upload_file_to_s3, download_file_from_s3, DATABASE_PATH
 import numpy as np
 import pandas as pd
 from streamlit_option_menu import option_menu
