@@ -57,14 +57,14 @@ metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# データベースファイルをS3にアップロード
-upload_file_to_s3(DATABASE_PATH)
-
 # アプリケーションの終了時にデータベースをアップロード
 import atexit
 
 def at_exit():
     session.commit()  # データベースセッションのコミット
-    upload_file_to_s3(DATABASE_PATH)
+    upload_file_to_s3(DATABASE_PATH, 'uploaded_files/uploaded_data.db')  # パスを明示的に指定
 
 atexit.register(at_exit)
+
+# データベースファイルをS3にアップロード
+upload_file_to_s3(DATABASE_PATH, 'uploaded_files/uploaded_data.db')  # 初期アップロード
