@@ -139,7 +139,7 @@ if selected == "メインページ":
                     f.write(st.session_state.uploaded_file.getbuffer())
 
                 # S3にBVHファイルをアップロード
-                s3_bvh_path = upload_file_to_s3(bvh_path)
+                s3_bvh_path = upload_file_to_s3(bvh_path, f"BVH/{bvh_filename}")
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
@@ -191,7 +191,7 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=os.path.basename(s3_bvh_path),  # S3のファイル名を保存
+                        bvh_filename=bvh_filename,  # S3のファイル名を保存
                     )
                 )
                 session.commit()
