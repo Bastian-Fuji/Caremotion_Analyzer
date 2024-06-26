@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, MetaData, 
 from sqlalchemy.orm import sessionmaker
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
+from oauth2client.service_account import ServiceAccountCredentials
 import streamlit as st
 
 # Google Drive認証
@@ -18,9 +19,12 @@ def authenticate_gdrive():
         "token_uri": "https://oauth2.googleapis.com/token",
         "revoke_uri": "https://oauth2.googleapis.com/revoke"
     }
-    gauth.credentials = {
+    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict({
+        "type": "service_account",
+        "client_id": st.secrets["google_drive"]["client_id"],
+        "client_secret": st.secrets["google_drive"]["client_secret"],
         "refresh_token": st.secrets["google_drive"]["refresh_token"]
-    }
+    })
     gauth.Authorize()
     return GoogleDrive(gauth)
 
