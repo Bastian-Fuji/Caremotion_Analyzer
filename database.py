@@ -14,16 +14,15 @@ s3 = boto3.client(
 BUCKET_NAME = st.secrets["s3"]["bucket_name"]
 
 # S3にファイルをアップロードする関数
-def upload_file_to_s3(local_path, s3_path=None):
-    if s3_path is None:
-        s3_path = os.path.join('uploaded_files', os.path.basename(local_path))
+def upload_file_to_s3(local_path, s3_folder):
+    s3_path = os.path.join(s3_folder, os.path.basename(local_path))
     s3.upload_file(local_path, BUCKET_NAME, s3_path)
     return s3_path
 
 # 保存ディレクトリの設定
-SAVE_DIR = "uploaded_files"
-if not os.path.exists(SAVE_DIR):
-    os.makedirs(SAVE_DIR)
+BVH_DIR = "BVH"
+if not os.path.exists(BVH_DIR):
+    os.makedirs(BVH_DIR)
 
 # データベースディレクトリの設定
 DB_DIR = "DB"
@@ -62,9 +61,6 @@ import atexit
 
 def at_exit():
     session.commit()  # データベースセッションのコミット
-    upload_file_to_s3(DATABASE_PATH, 'uploaded_files/uploaded_data.db')  # パスを明示的に指定
+    upload_file_to_s3(DATABASE_PATH, 'DB')  # データベースをS3にアップロード
 
 atexit.register(at_exit)
-
-# データベースファイルをS3にアップロード
-upload_file_to_s3(DATABASE_PATH, 'uploaded_files/uploaded_data.db')  # 初期アップロード
