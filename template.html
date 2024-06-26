@@ -20,41 +20,38 @@
 
         function init() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-            camera.position.set(0, 200, 400);
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.set(0, 100, 200); // 初期位置を少し引き気味に設定
 
             renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+            controls.enableDamping = true; // アニメーションループが必要な場合は、ダンピングまたは自動回転を有効にします
             controls.dampingFactor = 0.25;
             controls.screenSpacePanning = false;
             controls.minDistance = 100;
-            controls.maxDistance = 1000;
-            controls.maxPolarAngle = Math.PI / 2;
+            controls.maxDistance = 500;
+            controls.enableRotate = false; // 回転を無効にする
 
             const light = new THREE.DirectionalLight(0xffffff, 1);
             light.position.set(0, 200, 100).normalize();
             scene.add(light);
 
-            const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+            const ambientLight = new THREE.AmbientLight(0x404040); // ソフトな白色光
             scene.add(ambientLight);
 
             // BVHデータからスケルトンを作成
             const skeletonData = bvhData.root;
             const skeleton = createSkeleton(skeletonData);
-
-            // スケルトンの中心を計算してシーンの中心に移動
-            const center = calculateSkeletonCenter(skeleton);
-            skeleton.position.sub(center);
-
             scene.add(skeleton);
+
             skeletonHelper = new THREE.SkeletonHelper(skeleton);
             scene.add(skeletonHelper);
 
             clock = new THREE.Clock();
+
             animate();
         }
 
@@ -72,13 +69,6 @@
             }
 
             return bone;
-        }
-
-        function calculateSkeletonCenter(bone) {
-            const box = new THREE.Box3().setFromObject(bone);
-            const center = new THREE.Vector3();
-            box.getCenter(center);
-            return center;
         }
 
         function animate() {
