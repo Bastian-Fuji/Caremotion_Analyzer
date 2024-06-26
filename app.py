@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from bvh_parser import BVHParser
-from database import session, uploads_table, BVH_DIR, upload_file_to_s3
+from database import session, uploads_table, SAVE_DIR, upload_file_to_s3
 import numpy as np
 import pandas as pd
 from streamlit_option_menu import option_menu
@@ -128,18 +128,18 @@ if selected == "メインページ":
         else:
             try:
                 # 現在のタイムスタンプを取得
-                timestamp = datetime.now().strftime("%Y%m%d%H%MS")
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 
                 # ファイル名を生成
                 bvh_filename = f"{timestamp}_{st.session_state.uploaded_file.name}"
 
                 # BVHファイルに保存
-                bvh_path = os.path.join(BVH_DIR, bvh_filename)
+                bvh_path = os.path.join(SAVE_DIR, bvh_filename)
                 with open(bvh_path, "wb") as f:
                     f.write(st.session_state.uploaded_file.getbuffer())
 
                 # S3にBVHファイルをアップロード
-                s3_bvh_path = upload_file_to_s3(bvh_path, 'BVH')
+                s3_bvh_path = upload_file_to_s3(bvh_path, f"bvh/{bvh_filename}")
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
@@ -181,6 +181,9 @@ if selected == "メインページ":
 
                 st.write(f"NIOSH Lifting Index: {lifting_index:.2f}")
 
+                # `bvh/` プレフィックスを除外したファイル名を取得
+                bvh_filename_only = os.path.basename(bvh_filename)
+
                 # データベースに保存
                 session.execute(
                     uploads_table.insert().values(
@@ -191,14 +194,10 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=os.path.basename(s3_bvh_path),  # S3のパスを保存
+                        bvh_filename=bvh_filename_only,  # プレフィックスを除外したファイル名を保存
                     )
                 )
                 session.commit()
-
-                # データベースファイルをS3にアップロード
-                from database import DATABASE_PATH
-                upload_file_to_s3(DATABASE_PATH, 'DB')
 
                 # セッションステートを更新
                 st.session_state.age = age
@@ -401,7 +400,7 @@ elif selected == "動作比較":
             selected_id = int(selected_display_name.split(' : ')[0])
             selected_record = df[df['id'] == selected_id].iloc[0]
             bvh_filename = selected_record['bvh_filename']
-            bvh_path = os.path.join(BVH_DIR, bvh_filename)
+            bvh_path = os.path.join(SAVE_DIR, bvh_filename)
 
             # 選択されたIDの詳細情報を表示
             st.write("### 選択された動作の詳細")
