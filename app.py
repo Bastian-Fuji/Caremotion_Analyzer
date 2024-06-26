@@ -191,7 +191,7 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=s3_bvh_path,  # S3のパスを保存
+                        bvh_filename=os.path.basename(s3_bvh_path),  # S3のパスを保存
                     )
                 )
                 session.commit()
