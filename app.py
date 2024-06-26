@@ -139,7 +139,7 @@ if selected == "メインページ":
                     f.write(st.session_state.uploaded_file.getbuffer())
 
                 # BVHファイルをS3にアップロード
-                s3_bvh_path = upload_file_to_s3(bvh_path, BUCKET_NAME, bvh_filename)
+                upload_file_to_s3(bvh_path, bvh_filename)
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
