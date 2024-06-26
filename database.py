@@ -59,3 +59,12 @@ session = Session()
 
 # データベースファイルをS3にアップロード
 upload_file_to_s3(DATABASE_PATH)
+
+# アプリケーションの終了時にデータベースをアップロード
+import atexit
+
+def at_exit():
+    session.commit()  # データベースセッションのコミット
+    upload_file_to_s3(DATABASE_PATH)
+
+atexit.register(at_exit)
