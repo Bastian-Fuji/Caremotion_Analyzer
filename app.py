@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from bvh_parser import BVHParser
-from database import session, uploads_table, SAVE_DIR, upload_file_to_s3
+from database import session, uploads_table, SAVE_DIR, upload_file_to_s3, download_file_from_s3
 import numpy as np
 import pandas as pd
 from streamlit_option_menu import option_menu
@@ -128,7 +128,7 @@ if selected == "メインページ":
         else:
             try:
                 # 現在のタイムスタンプを取得
-                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                timestamp = datetime.now().strftime("%Y%m%d%H%MS")
 
                 # ファイル名を生成
                 bvh_filename = f"{timestamp}_{st.session_state.uploaded_file.name}"
@@ -139,7 +139,7 @@ if selected == "メインページ":
                     f.write(st.session_state.uploaded_file.getbuffer())
 
                 # S3にBVHファイルをアップロード
-                s3_bvh_path = upload_file_to_s3(bvh_path, f"BVH/{bvh_filename}")
+                s3_bvh_path = upload_file_to_s3(bvh_path)
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
@@ -181,9 +181,6 @@ if selected == "メインページ":
 
                 st.write(f"NIOSH Lifting Index: {lifting_index:.2f}")
 
-                # `bvh/` プレフィックスを除外したファイル名を取得
-                bvh_filename_only = os.path.basename(bvh_filename)
-
                 # データベースに保存
                 session.execute(
                     uploads_table.insert().values(
@@ -194,7 +191,7 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=bvh_filename_only,  # プレフィックスを除外したファイル名を保存
+                        bvh_filename=os.path.basename(s3_bvh_path),  # S3のファイル名を保存
                     )
                 )
                 session.commit()
@@ -414,6 +411,9 @@ elif selected == "動作比較":
             st.write(f"**NIOSH Index:** {selected_record['niosh_index']:.2f}")
 
             try:
+                # S3からBVHファイルをダウンロード
+                download_file_from_s3(f"BVH/{bvh_filename}", bvh_path)
+
                 bvh_parser = BVHParser(bvh_path)
                 bvh_parser.parse()
 
