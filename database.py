@@ -7,8 +7,13 @@ SAVE_DIR = "uploaded_files"
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
 
+# データベースディレクトリの設定
+DB_DIR = "CareMotionAnalyzer/DB"
+if not os.path.exists(DB_DIR):
+    os.makedirs(DB_DIR)
+
 # データベース設定
-DATABASE_URL = "sqlite:///uploaded_data.db"
+DATABASE_URL = f"sqlite:///{os.path.join(DB_DIR, 'uploaded_data.db')}"
 engine = create_engine(DATABASE_URL)
 metadata = MetaData()
 
