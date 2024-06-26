@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 import io
 
-# サイドバーにメニューを追加
 with st.sidebar:
     selected = option_menu(
         menu_title=None,  # メニュータイトル
@@ -178,7 +177,7 @@ if selected == "メインページ":
                 st.session_state.bvh_path = bvh_path
                 st.session_state.submitted = True
 
-                st.success(f"データが保存されました: {s3_bvh_path}")
+                st.success(f"データが保存されました: {bvh_path}")
 
                 st.write(f"NIOSH Lifting Index: {lifting_index:.2f}")
 
@@ -192,7 +191,7 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=s3_bvh_path,
+                        bvh_filename=bvh_filename,
                     )
                 )
                 session.commit()
