@@ -16,7 +16,7 @@ BUCKET_NAME = st.secrets["s3"]["bucket_name"]
 # S3にファイルをアップロードする関数
 def upload_file_to_s3(local_path, s3_path=None):
     if s3_path is None:
-        s3_path = os.path.basename(local_path)
+        s3_path = os.path.join('uploaded_files', os.path.basename(local_path))
     s3.upload_file(local_path, BUCKET_NAME, s3_path)
     return s3_path
 
@@ -26,12 +26,13 @@ if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
 
 # データベースディレクトリの設定
-DB_DIR = "CareMotionAnalyzer/DB"
+DB_DIR = "DB"
 if not os.path.exists(DB_DIR):
     os.makedirs(DB_DIR)
 
-# データベース設定
 DATABASE_PATH = os.path.join(DB_DIR, 'uploaded_data.db')
+
+# データベース設定
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 engine = create_engine(DATABASE_URL)
 metadata = MetaData()
@@ -57,4 +58,4 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # データベースファイルをS3にアップロード
-db_s3_path = upload_file_to_s3(DATABASE_PATH, "uploaded_files/uploaded_data.db")
+upload_file_to_s3(DATABASE_PATH)

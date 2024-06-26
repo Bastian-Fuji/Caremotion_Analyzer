@@ -138,8 +138,8 @@ if selected == "メインページ":
                 with open(bvh_path, "wb") as f:
                     f.write(st.session_state.uploaded_file.getbuffer())
 
-                # BVHファイルをS3にアップロード
-                s3_bvh_path = upload_file_to_s3(bvh_path, f"uploaded_files/{bvh_filename}")
+                # S3にBVHファイルをアップロード
+                s3_bvh_path = upload_file_to_s3(bvh_path)
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
@@ -150,7 +150,6 @@ if selected == "メインページ":
                 frame_data = bvh_parser.frames
                 
                 # ここでは腰の位置を取得することを仮定
-                # "root"ノードが存在することを前提にしています
                 hips_node = root_node  # rootノードが腰の位置を示していると仮定
 
                 # 全フレームの腰の位置を取得
@@ -192,7 +191,7 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=bvh_filename,
+                        bvh_filename=s3_bvh_path,  # S3のパスを保存
                     )
                 )
                 session.commit()
@@ -243,7 +242,6 @@ if selected == "メインページ":
                 st.components.v1.html(html_template, height=600)
             except Exception as e:
                 st.error(f"エラーが発生しました: {e}")
-
 
 elif selected == "ダッシュボード":
     st.title("データ分布ダッシュボード")
