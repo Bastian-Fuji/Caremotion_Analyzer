@@ -36,13 +36,16 @@
             // BVHデータからスケルトンを作成
             const skeletonData = bvhData.root;
             const skeleton = createSkeleton(skeletonData);
-            scene.add(skeleton);
 
+            // スケルトンの中心を計算してシーンの中心に移動
+            const center = calculateSkeletonCenter(skeleton);
+            skeleton.position.sub(center);
+
+            scene.add(skeleton);
             skeletonHelper = new THREE.SkeletonHelper(skeleton);
             scene.add(skeletonHelper);
 
             clock = new THREE.Clock();
-
             animate();
         }
 
@@ -60,6 +63,13 @@
             }
 
             return bone;
+        }
+
+        function calculateSkeletonCenter(bone) {
+            const box = new THREE.Box3().setFromObject(bone);
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+            return center;
         }
 
         function animate() {
