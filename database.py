@@ -13,12 +13,18 @@ def authenticate_gdrive():
     gauth.settings['client_config'] = {
         "client_id": st.secrets["google_drive"]["client_id"],
         "client_secret": st.secrets["google_drive"]["client_secret"],
-        "redirect_uri": "urn:ietf:wg:oauth:2.0:oob"
+        "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token"
     }
-    gauth.credentials = {
-        "refresh_token": st.secrets["google_drive"]["refresh_token"]
-    }
-    gauth.Authorize()
+    gauth.LoadCredentialsFile("credentials.json")
+    if gauth.credentials is None:
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        gauth.Refresh()
+    else:
+        gauth.Authorize()
+    gauth.SaveCredentialsFile("credentials.json")
     return GoogleDrive(gauth)
 
 drive = authenticate_gdrive()
