@@ -1,6 +1,8 @@
 # CareMotionAnalyzer
 
 CareMotionAnalyzerは、介護動作のBVHファイルを解析し、NIOSH Lifting Indexを計算・可視化するアプリケーションです。これにより、介護動作の安全性を評価し、リスクを特定できます。
+実際のデモはこちらです⇩
+[CareMotionAnalyzer](https://caremotionanalyzer.streamlit.app/)
 
 ## 主な機能
 
@@ -42,3 +44,5 @@ CareMotionAnalyzerは、介護動作のBVHファイルを解析し、NIOSH Lifti
 ---
 
 CareMotionAnalyzerは、介護動作の解析とリスク評価を支援するために設計されています。ぜひご活用ください。
+連絡先
+yamasaki.kakeru990@mail.kyutech.jp
