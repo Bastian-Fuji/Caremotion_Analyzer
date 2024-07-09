@@ -114,7 +114,7 @@ if selected == "メインページ":
         CM = 1  # Coupling Multiplier (assumed)
 
         RWL = LC * HM * VM * DM * FM * AM * CM  # Recommended Weight Limit
-        LI = weight / RWL  # Lifting Index
+        LI = 20 / RWL  # Lifting Index
 
         return LI
 
@@ -124,7 +124,7 @@ if selected == "メインページ":
         elif care_action == "選択してください":
             st.error("介護動作を選択してください")
         elif not st.session_state.uploaded_file:
-            st.error("BVHファイルをアップロードしてください")
+            st.error("BVHファイル(mocopi動作ファイル)をアップロードしてください")
         else:
             try:
                 # 現在のタイムスタンプを取得
@@ -179,7 +179,7 @@ if selected == "メインページ":
 
                 st.success(f"データが保存されました: {s3_bvh_path}")
 
-                st.write(f"NIOSH Lifting Index: {lifting_index:.2f}")
+                st.write(f"NIOSH Lifting Index(1以上は腰部負担リスクがあります): {lifting_index:.2f}")
 
                 # データベースに保存
                 session.execute(
