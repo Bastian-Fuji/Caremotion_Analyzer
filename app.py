@@ -98,7 +98,7 @@ if selected == "メインページ":
     )
 
     # BVHファイルアップロード
-    uploaded_file = st.file_uploader("BVHファイルをアップロード", type=["bvh"])
+    uploaded_file = st.file_uploader("BVHファイル(mocopi動作ファイル)をアップロード", type=["bvh"])
     if uploaded_file is not None:
         st.session_state.uploaded_file = uploaded_file
 
@@ -346,7 +346,7 @@ elif selected == "ダッシュボード":
         st.write(f"NIOSH Indexの標準偏差: {std_index:.2f}")
 
         # 相関分析
-        st.subheader("相関分析")
+        st.subheader("相関分析(どの程度関係があるか，絶対値が1になるほど関係がある)")
         numeric_df = df.drop(columns=['id']).select_dtypes(include=[np.number])  # 数値データのみ選択（id 列を除外）
         corr_matrix = numeric_df.corr()
         fig, ax = plt.subplots(figsize=(10, 6))
