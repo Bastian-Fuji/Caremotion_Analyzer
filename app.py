@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from bvh_parser import BVHParser
-from database import session, uploads_table, SAVE_DIR, upload_file_to_s3, download_file_from_s3, DATABASE_PATH
+from database import session, uploads_table, SAVE_DIR, DATABASE_PATH
 import numpy as np
 import pandas as pd
 from streamlit_option_menu import option_menu
@@ -138,8 +138,7 @@ if selected == "メインページ":
                 with open(bvh_path, "wb") as f:
                     f.write(st.session_state.uploaded_file.getbuffer())
 
-                # S3にBVHファイルをアップロード
-                s3_bvh_path = upload_file_to_s3(bvh_path, f"BVH/{bvh_filename}")
+
 
                 # BVHデータを解析
                 bvh_parser = BVHParser(bvh_path)
@@ -177,7 +176,7 @@ if selected == "メインページ":
                 st.session_state.bvh_path = bvh_path
                 st.session_state.submitted = True
 
-                st.success(f"データが保存されました: {s3_bvh_path}")
+                st.success(f"データが保存されました: {bvh_path}")
 
                 st.write(f"NIOSH Lifting Index(1以上は腰部負担リスクがあります): {lifting_index:.2f}")
 
@@ -191,13 +190,10 @@ if selected == "メインページ":
                         experience=experience,
                         care_action=care_action,
                         niosh_index=lifting_index,
-                        bvh_filename=bvh_filename,  # S3のファイル名を保存
+                        bvh_filename=bvh_filename,  # ファイル名を保存
                     )
                 )
                 session.commit()
-
-                # S3にデータベースファイルをアップロード
-                upload_file_to_s3(DATABASE_PATH, "DB/uploaded_data.db")
 
                 # セッションステートを更新
                 st.session_state.age = age

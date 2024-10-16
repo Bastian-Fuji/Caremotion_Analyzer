@@ -1,31 +1,6 @@
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Float, MetaData, Table
 from sqlalchemy.orm import sessionmaker
-import boto3
-import streamlit as st
-from botocore.exceptions import ClientError
-
-# Amazon S3設定
-s3 = boto3.client(
-    's3',
-    aws_access_key_id=st.secrets["s3"]["aws_access_key_id"],
-    aws_secret_access_key=st.secrets["s3"]["aws_secret_access_key"],
-    region_name=st.secrets["s3"]["region"]
-)
-BUCKET_NAME = st.secrets["s3"]["bucket_name"]
-
-# S3にファイルをアップロードする関数
-def upload_file_to_s3(local_path, s3_path):
-    s3.upload_file(local_path, BUCKET_NAME, s3_path)
-    return s3_path
-
-# S3からファイルをダウンロードする関数
-def download_file_from_s3(s3_path, local_path):
-    try:
-        s3.download_file(BUCKET_NAME, s3_path, local_path)
-    except ClientError as e:
-        if e.response['Error']['Code'] != '404':
-            raise
 
 # 保存ディレクトリの設定
 SAVE_DIR = "BVH"
@@ -39,12 +14,10 @@ if not os.path.exists(DB_DIR):
 
 DATABASE_PATH = os.path.join(DB_DIR, 'uploaded_data.db')
 
-# S3からデータベースファイルをダウンロード
-download_file_from_s3('DB/uploaded_data.db', DATABASE_PATH)
-
 # データベース設定
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 engine = create_engine(DATABASE_URL)
+
 metadata = MetaData()
 
 # テーブルの定義
