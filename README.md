@@ -45,4 +45,5 @@ CareMotionAnalyzerは、介護動作のBVHファイルを解析し、NIOSH Lifti
 
 CareMotionAnalyzerは、介護動作の解析とリスク評価を支援するために設計されています。ぜひご活用ください。
 連絡先
-yamasaki.kakeru990@mail.kyutech.jp
+
+yutarou2001.0917@gmail.com
